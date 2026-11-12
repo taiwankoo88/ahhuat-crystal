@@ -4,6 +4,7 @@ import { CRYSTAL_MAP, ELEMENTS } from '../data/crystals.js'
 import { useLang, localizeCrystal, money, ELEMENT_I18N } from '../i18n.jsx'
 import { waLink, isCloud } from '../data/store.js'
 import { api } from '../data/api.js'
+import { addMyOrder } from '../data/myOrders.js'
 import { WhatsAppIcon } from './icons.jsx'
 
 export function ProductSheet({ open, onClose, product }) {
@@ -62,6 +63,14 @@ export function ProductSheet({ open, onClose, product }) {
         })
         .catch(() => {})
     }
+
+    // 本机「我的订单」记录（不依赖云端）
+    addMyOrder({
+      type: 'product',
+      name: name.trim(), phone: phone.trim(), address: address.trim(),
+      productId: product.id, productName: product.name, productNameEn: product.name_en,
+      size: picked.size, total: picked.price,
+    })
 
     const lines =
       lang === 'zh'

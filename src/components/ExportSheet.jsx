@@ -6,6 +6,7 @@ import { CRYSTAL_MAP } from '../data/crystals.js'
 import { summarize } from '../utils/bracelet.js'
 import { waLink, isCloud } from '../data/store.js'
 import { api } from '../data/api.js'
+import { addMyOrder } from '../data/myOrders.js'
 import { DownloadIcon, ShareIcon, WhatsAppIcon } from './icons.jsx'
 
 const apiCreateOrder = api.createOrder
@@ -94,6 +95,14 @@ export function ExportSheet({ open, onClose, beads, dark, wristCm }) {
         total: stats.price, channel: 'web',
       }).catch(() => {})
     }
+
+    // 本机「我的订单」记录（不依赖云端）
+    addMyOrder({
+      type: 'diy',
+      name: name.trim(), phone: phone.trim(), address: address.trim(),
+      beads: beads.map((b) => ({ crystalId: b.crystalId, size: b.size })),
+      wristCm, count: stats.count, total: stats.price,
+    })
 
     const lines =
       lang === 'zh'

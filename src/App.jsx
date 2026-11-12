@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Home } from './components/Home.jsx'
 import { Designer } from './components/Designer.jsx'
 import { Admin } from './components/Admin.jsx'
+import { MyOrders } from './components/MyOrders.jsx'
 import { CrystalBackground } from './components/CrystalBackground.jsx'
 import { EnergyGuide } from './components/EnergyGuide.jsx'
 import { NAV_GLOSS } from './components/NavGlossIcons.jsx'
@@ -129,7 +130,7 @@ export default function App() {
         {tab === 'home' && <Home onStart={start} onOpenGuide={() => goTab('discover')} />}
         {tab === 'design' && <Designer key={designKey} dark={dark} initialBeads={initialBeads} smartSignal={smartSignal} />}
         {tab === 'discover' && <EnergyGuide onStart={start} />}
-        {tab === 'order' && <Orders onStart={start} />}
+        {tab === 'order' && <MyOrders onStart={start} />}
         {tab === 'me' && <Profile dark={dark} setDark={setDark} onOpenAdmin={() => setShowAdmin(true)} />}
       </main>
 
@@ -224,23 +225,6 @@ function Discover({ onStart }) {
   )
 }
 
-/* ---------- Orders ---------- */
-function Orders({ onStart }) {
-  const { t } = useLang()
-  return (
-    <div className="mx-auto flex max-w-md flex-col items-center px-6 pb-28 pt-24 text-center">
-      <div className="grid h-24 w-24 place-items-center rounded-full bg-brand-50 dark:bg-brand-900/30">
-        <OrderIcon size={44} className="text-brand-400" />
-      </div>
-      <h3 className="mt-5 text-lg font-semibold text-neutral-900 dark:text-white">{t('order.empty.title')}</h3>
-      <p className="mt-1.5 text-[14px] text-neutral-500 dark:text-neutral-400">{t('order.empty.desc')}</p>
-      <button onClick={() => onStart()} className="mt-6 rounded-full bg-brand-500 px-6 py-3 text-[15px] font-medium text-white shadow-glow transition hover:bg-brand-600 active:scale-95">
-        {t('order.empty.btn')}
-      </button>
-    </div>
-  )
-}
-
 /* ---------- Profile ---------- */
 function Profile({ dark, setDark, onOpenAdmin }) {
   const { t } = useLang()
@@ -301,7 +285,7 @@ function Profile({ dark, setDark, onOpenAdmin }) {
         ))}
       </div>
       <p className="mt-6 text-center text-[12px] text-neutral-400">{t('brand.footer')}</p>
-      <p className="mt-1 text-center text-[11px] text-neutral-300 dark:text-neutral-600">v47 · 2026.09.22 · 成品下单进后台</p>
+      <p className="mt-1 text-center text-[11px] text-neutral-300 dark:text-neutral-600">v48 · 2026.11.12 · 顾客订单页</p>
     </div>
   )
 }
