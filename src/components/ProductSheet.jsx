@@ -5,6 +5,7 @@ import { useLang, localizeCrystal, money, ELEMENT_I18N } from '../i18n.jsx'
 import { waLink, isCloud } from '../data/store.js'
 import { api } from '../data/api.js'
 import { addMyOrder } from '../data/myOrders.js'
+import { soldOut, lowStock } from '../utils/stock.js'
 import { WhatsAppIcon } from './icons.jsx'
 
 export function ProductSheet({ open, onClose, product }) {
@@ -17,7 +18,9 @@ export function ProductSheet({ open, onClose, product }) {
 
   useEffect(() => {
     if (open) {
-      setSizeIdx(0)
+      // 默认选第一个有货的尺寸
+      const first = (product?.sizes || []).findIndex((x) => !soldOut(x))
+      setSizeIdx(first < 0 ? 0 : first)
       setErr('')
     }
   }, [open, product])
@@ -33,7 +36,7 @@ export function ProductSheet({ open, onClose, product }) {
   const picked = sizes[sizeIdx] || sizes[0]
 
   const order = () => {
-    if (!picked) return
+    if (!picked || soldOut(picked)) return
     if (!name.trim() || !address.trim()) {
       setErr(t('order.needinfo'))
       return
@@ -127,18 +130,25 @@ export function ProductSheet({ open, onClose, product }) {
           <div className={`grid gap-2 ${sizes.length >= 4 ? 'grid-cols-4' : 'grid-cols-3'}`}>
             {sizes.map((s, i) => {
               const active = i === sizeIdx
+              const out = soldOut(s)
               return (
                 <button
                   key={`${s.size}-${i}`}
                   onClick={() => setSizeIdx(i)}
-                  className={`flex flex-col items-center rounded-2xl border px-2 py-2.5 transition active:scale-95 ${
+                  disabled={out}
+                  className={`flex flex-col items-center rounded-2xl border px-2 py-2.5 transition active:scale-95 disabled:opacity-40 disabled:active:scale-100 ${
                     active
                       ? 'border-brand-500 bg-brand-50 text-brand-700 dark:border-brand-400 dark:bg-brand-900/30 dark:text-brand-200'
                       : 'border-black/8 bg-white text-neutral-600 dark:border-white/10 dark:bg-neutral-800 dark:text-neutral-300'
                   }`}
                 >
                   <span className="text-[14px] font-semibold">{s.size}mm</span>
-                  <span className="text-[12px]">{money(s.price)}</span>
+                  <span className="text-[12px]">{out ? t('product.soldout') : money(s.price)}</span>
+                  {lowStock(s) && (
+                    <span className="mt-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                      {lang === 'zh' ? `仅剩 ${s.stock}` : `${s.stock} left`}
+                    </span>
+                  )}
                 </button>
               )
             })}
@@ -168,10 +178,10 @@ export function ProductSheet({ open, onClose, product }) {
 
       <button
         onClick={order}
-        disabled={!picked}
+        disabled={!picked || soldOut(picked)}
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] py-3.5 font-medium text-white shadow-glow transition hover:brightness-105 active:scale-[0.99] disabled:opacity-50"
       >
-        <WhatsAppIcon size={20} /> {t('product.buy')}
+        <WhatsAppIcon size={20} /> {picked && soldOut(picked) ? t('product.soldout') : t('product.buy')}
       </button>
       <p className="mt-2 px-1 text-[11px] leading-relaxed text-neutral-400">{t('product.order.note')}</p>
     </Modal>

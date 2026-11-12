@@ -1,3 +1,4 @@
+import { tracked, allSoldOut } from '../utils/stock.js'
 import { useEffect, useRef, useState } from 'react'
 import { Bead } from './Bead.jsx'
 import { CATEGORIES, ELEMENTS, CRYSTALS } from '../data/crystals.js'
@@ -343,7 +344,7 @@ function ProductAdmin({ store, onMsg }) {
       keywords: (item.keywords || []).join('、'),
       energy: item.energy || '',
       energy_en: item.energy_en || '',
-      sizes: (item.sizes && item.sizes.length ? item.sizes : [{ size: '', price: '' }]).map((s) => ({ size: String(s.size), price: String(s.price) })),
+      sizes: (item.sizes && item.sizes.length ? item.sizes : [{ size: '', price: '' }]).map((s) => ({ size: String(s.size), price: String(s.price), stock: s.stock == null ? '' : String(s.stock) })),
     })
     setEditing({ id: item.id, isDefault })
   }
@@ -359,7 +360,12 @@ function ProductAdmin({ store, onMsg }) {
       keywords: f.keywords.split(/[,，、]/).map((s) => s.trim()).filter(Boolean),
       energy: f.energy,
       energy_en: f.energy_en,
-      sizes: f.sizes.filter((s) => s.size && s.price).map((s) => ({ size: Number(s.size), price: Number(s.price) })),
+      sizes: f.sizes.filter((s) => s.size && s.price).map((s) => ({
+        size: Number(s.size),
+        price: Number(s.price),
+        // 库存留空 = 不限（不写 stock 字段）；否则取非负整数
+        ...(s.stock !== '' && s.stock != null ? { stock: Math.max(0, Math.floor(Number(s.stock)) || 0) } : {}),
+      })),
     }
     if (f.image) patch.image = f.image
     if (!editing) addProduct({ ...patch, image: f.image })
@@ -404,6 +410,7 @@ function ProductAdmin({ store, onMsg }) {
               <div key={i} className="flex items-center gap-2">
                 <input className={inputCls + ' flex-1'} type="number" placeholder={t('admin.size')} value={s.size} onChange={(e) => setSize(i, 'size', e.target.value)} />
                 <input className={inputCls + ' flex-1'} type="number" placeholder="RM" value={s.price} onChange={(e) => setSize(i, 'price', e.target.value)} />
+                <input className={inputCls + ' flex-1'} type="number" min="0" placeholder={t('admin.stock.ph')} value={s.stock ?? ''} onChange={(e) => setSize(i, 'stock', e.target.value)} />
                 <button onClick={() => rmSize(i)} className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-black/5 text-neutral-400 dark:bg-white/10" aria-label="remove size">
                   <TrashIcon size={15} />
                 </button>
@@ -413,6 +420,7 @@ function ProductAdmin({ store, onMsg }) {
           <button onClick={addSizeRow} className="mt-2 flex items-center gap-1 text-[13px] font-medium text-brand-600 dark:text-brand-300">
             <PlusIcon size={15} /> {t('admin.addSize')}
           </button>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-400">{t('admin.stock.hint')}</p>
         </div>
 
         <div className="mt-3 grid gap-2">
@@ -450,6 +458,11 @@ function ProductAdmin({ store, onMsg }) {
             {p.image && <img src={p.image} alt="" className="mx-auto h-24 w-24 object-contain" />}
             <div className="mt-1 text-[13px] font-medium text-neutral-900 dark:text-white">{lang === 'zh' ? p.name : p.name_en}</div>
             <div className="text-[12px] font-semibold text-brand-600 dark:text-brand-300">{p.sizes?.length ? money(Math.min(...p.sizes.map((s) => s.price))) : ''}</div>
+            {p.sizes?.some(tracked) && (
+              <div className={`text-[11px] ${allSoldOut(p) ? 'font-medium text-red-500' : 'text-neutral-400'}`}>
+                {allSoldOut(p) ? t('product.soldout') : `${t('admin.stock')} ${p.sizes.map((s) => (tracked(s) ? s.stock : '∞')).join(' / ')}`}
+              </div>
+            )}
           </div>
         ))}
       </div>

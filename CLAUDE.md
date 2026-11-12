@@ -1,7 +1,7 @@
 # CLAUDE.md · 阿发水晶阁 AH HUAT CRYSTAL PAVILION
 
 > 给 Claude Code 的项目记忆。每次开新会话先读这里，再动手。
-> 当前版本：**v47**（2026-09-22）。版本号写在 `src/App.jsx` Profile 底部的 `<p>` 里，以及每条 commit message 的结尾 `(vNN)`。**每次代码改动都要同时把这两处 +1；纯文档（CLAUDE.md / README / docs）改动不升版本。**
+> 当前版本：**v49**（2026-11-12）。版本号写在 `src/App.jsx` Profile 底部的 `<p>` 里，以及每条 commit message 的结尾 `(vNN)`。**每次代码改动都要同时把这两处 +1；纯文档（CLAUDE.md / README / docs）改动不升版本。**
 
 ---
 
@@ -129,8 +129,8 @@ localStorage key 全部带 `_v1` 后缀（`ah_beads_v1` 等），主题键是 `s
 
 ## 7. 已知未完成 / 待办（按价值排序）
 
-1. **顾客端「订单」Tab 是空壳**（`App.jsx` `Orders()` 只有空状态）。DIY 和成品下单都已写云端 `orders` 表，但顾客看不到自己的记录，也没有本地「我的设计」保存。
-2. **库存字段没用起来**：`schema.sql` 和 API 有 `stock`，前端不显示也不校验。
+1. ~~顾客端「订单」Tab 是空壳~~ v48 已做（本机记录）。仍缺：订单状态（需要一个顾客可读的查询接口，`_worker.js` 和 `functions/` 都要改）、本地「我的设计」保存。
+2. ~~库存字段没用起来~~ v49 已做成品库存，记在 `sizes[].stock`（不用表里的 `stock` 列：它默认 0，无法区分「没设置」和「售罄」）。仍缺：下单/完成订单时自动扣减；DIY 珠子没有库存。
 3. **`functions/` 与 `_worker.js` 重复**（见 §5），迟早漂移。建议删 `functions/`，只留 `_worker.js`。
 4. **README 已过时**（还写着 12 种水晶、无后台、无 i18n）。
 5. 没有任何测试/lint；`bracelet.js` 和 `store.js` 是最值得先加单测的两个纯逻辑文件。
@@ -143,6 +143,8 @@ localStorage key 全部带 `_v1` 后缀（`ah_beads_v1` 等），主题键是 `s
 
 | 版本 | 内容 |
 |---|---|
+| v49 | 成品库存：每个尺寸可填库存（`sizes[].stock`，留空=不限，0=售罄），后台可编辑，顾客端显示售罄/仅剩 N；不自动扣减。规则在 `src/utils/stock.js` |
+| v48 | 顾客「订单」Tab：下单时写本机 `ah_myorders_v1`（`src/data/myOrders.js`、`MyOrders.jsx`），不依赖云端、不显示订单状态 |
 | v47 | 成品下单进 CRM：ProductSheet 加收货信息表单，云端 createOrder（summary 前缀「成品 ·」） |
 | v46 | OG/Twitter 分享预览 + share.jpg |
 | v45 | 默认浅色模式；设计页浅色可读性 |

@@ -6,6 +6,7 @@ import { IceCaveImage } from './CrystalBackground.jsx'
 import { CRYSTALS, CRYSTAL_MAP } from '../data/crystals.js'
 import { PRESETS, ZODIACS, BIRTH_MONTHS, zodiacByDate, buildPatternFromCrystals } from '../data/recommendations.js'
 import { useStore, effectiveDefaultProducts } from '../data/store.js'
+import { allSoldOut } from '../utils/stock.js'
 import { makeBead } from '../utils/bracelet.js'
 import { useLang, localizeCrystal, money, PRESET_I18N, ZODIAC_I18N } from '../i18n.jsx'
 import { GemCrystalIcon, DiamondSparkIcon, EnergyOrbIcon, GiftGlowIcon, ZodiacMedallion } from './CrystalIcons.jsx'
@@ -206,6 +207,7 @@ export function Home({ onStart, onOpenGuide }) {
               const badge = lang === 'zh' ? pr.badge : pr.badge_en
               const kws = c?.keywords || pr.keywords || []
               const min = pr.sizes?.length ? Math.min(...pr.sizes.map((s) => s.price)) : 0
+              const out = allSoldOut(pr)
               return (
                 <button
                   key={pr.id}
@@ -218,6 +220,11 @@ export function Home({ onStart, onOpenGuide }) {
                     {badge && (
                       <span className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur">
                         {badge}
+                      </span>
+                    )}
+                    {out && (
+                      <span className="absolute right-3 top-3 rounded-full bg-red-500 px-2.5 py-1 text-[10px] font-medium text-white">
+                        {t('product.soldout')}
                       </span>
                     )}
                   </div>
