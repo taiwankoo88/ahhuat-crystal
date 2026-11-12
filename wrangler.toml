@@ -3,12 +3,13 @@ name = "ahhuat-crystal"
 compatibility_date = "2024-11-01"
 pages_build_output_dir = "dist"
 
-# 数据库(D1)与密码请在 Cloudflare 控制台里绑定/设置（见 docs/上线指南-Cloudflare.md 第5步）：
-#   Settings → Functions → D1 database bindings：变量名 DB → 选 ahhuat
-#   Settings → Environment variables：ADMIN_PASSWORD、AUTH_SECRET
-#
-# 如果你改用命令行 wrangler 本地开发，可解开下面注释并填入真实 database_id：
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "ahhuat"
-# database_id = "你的-d1-database-id"
+# ★ 这个文件带 pages_build_output_dir，所以 Cloudflare 以它为准：
+#   控制台里的 Bindings 不生效，D1 必须写在这里（2026-11-12：缺了这段，线上 /api 全部返回 no-db）。
+#   正式站和预览版都用同一个数据库。database_id 不是密码，可以公开。
+[[d1_databases]]
+binding = "DB"
+database_name = "ahhuat"
+database_id = "ae336ec9-7f56-4ef9-b0d7-780ff9045bb4"
+
+# 密码类（ADMIN_PASSWORD、AUTH_SECRET）不要写进这个文件（仓库是公开的）：
+#   在控制台 Settings → Variables and secrets 里加，类型选 Secret。
