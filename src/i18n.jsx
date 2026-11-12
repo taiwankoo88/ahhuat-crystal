@@ -549,12 +549,16 @@ const LangCtx = createContext(null)
 
 export function LangProvider({ children }) {
   const [lang, setLang] = useState(() => {
-    const saved = localStorage.getItem('sl-lang')
-    if (saved) return saved
-    return (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en'
+    // v50：默认华语（不再看浏览器语言）。换了新 key：旧 key 'sl-lang' 在首次打开时就被自动写入，
+    // 分不清是顾客自己选的还是默认值。
+    try {
+      const saved = localStorage.getItem('sl-lang2')
+      if (saved === 'zh' || saved === 'en') return saved
+    } catch (_) {}
+    return 'zh'
   })
   useEffect(() => {
-    localStorage.setItem('sl-lang', lang)
+    try { localStorage.setItem('sl-lang2', lang) } catch (_) {}
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
   }, [lang])
 

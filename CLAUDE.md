@@ -1,7 +1,7 @@
 # CLAUDE.md · 阿发水晶阁 AH HUAT CRYSTAL PAVILION
 
 > 给 Claude Code 的项目记忆。每次开新会话先读这里，再动手。
-> 当前版本：**v49**（2026-11-12）。版本号写在 `src/App.jsx` Profile 底部的 `<p>` 里，以及每条 commit message 的结尾 `(vNN)`。**每次代码改动都要同时把这两处 +1；纯文档（CLAUDE.md / README / docs）改动不升版本。**
+> 当前版本：**v50**（2026-11-12）。版本号写在 `src/App.jsx` Profile 底部的 `<p>` 里，以及每条 commit message 的结尾 `(vNN)`。**每次代码改动都要同时把这两处 +1；纯文档（CLAUDE.md / README / docs）改动不升版本。**
 
 ---
 
@@ -123,7 +123,8 @@ localStorage key 全部带 `_v1` 后缀（`ah_beads_v1` 等），主题键是 `s
 - `main` 分支从 v47 起与生产分支同步（每次合并 PR 到生产分支后，把生产分支 head 快进推到 main：`git push origin origin/claude/jewelry-diy-app-ec4kjm:main`）。之前 main 长期停在 v25。
 - 开发分支按会话分配（如 `claude/elegant-mccarthy-t5q3bh`），从生产分支切出，完成后 push 并开 draft PR **合回生产分支**。
 - 线上域名：`ahhuat.pages.dev`（写在 `index.html` 的 og 标签里；如果换域名要一起改）。
-- Cloudflare 侧手工配置：D1 绑定变量名 `DB`、环境变量 `ADMIN_PASSWORD`、`AUTH_SECRET`。
+- **D1 绑定写在 `wrangler.toml`**（变量名 `DB`）：该文件带 `pages_build_output_dir`，Cloudflare 以它为准，控制台里的 Bindings 不生效。正式站和预览版（`<分支名>.ahhuat.pages.dev`）共用同一个数据库，在预览版后台做的修改是真的。
+- Cloudflare 控制台手工配置：`ADMIN_PASSWORD`、`AUTH_SECRET`（类型选 Secret；2026-11-12 查看时两个都没设置，用的是代码默认值或数据库 `settings.admin_pass`）。
 
 ---
 
@@ -143,6 +144,7 @@ localStorage key 全部带 `_v1` 后缀（`ah_beads_v1` 等），主题键是 `s
 
 | 版本 | 内容 |
 |---|---|
+| v50 | 默认语言改为华语（键 `sl-lang2`，不再看浏览器语言）；`wrangler.toml` 加 D1 绑定（之前线上 /api 全部 no-db，见 §6） |
 | v49 | 成品库存：每个尺寸可填库存（`sizes[].stock`，留空=不限，0=售罄），后台可编辑，顾客端显示售罄/仅剩 N；不自动扣减。规则在 `src/utils/stock.js` |
 | v48 | 顾客「订单」Tab：下单时写本机 `ah_myorders_v1`（`src/data/myOrders.js`、`MyOrders.jsx`），不依赖云端、不显示订单状态 |
 | v47 | 成品下单进 CRM：ProductSheet 加收货信息表单，云端 createOrder（summary 前缀「成品 ·」） |
